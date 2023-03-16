@@ -35,7 +35,19 @@ jobs:
         with:
           api-level: 29
           profile: ${{ matrix.device }}
-          script: flutter test integration_test --verbose
+          script: flutter test integration_test/app_test.dart --verbose
+
+      - name: Take screenshots
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          profile: ${{ matrix.device }}
+          script: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/screenshot_test.dart
+      - name: screenshot artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots_android
+          path: screenshots/*
 
   build-android:
     needs: [test-android]
@@ -78,7 +90,6 @@ jobs:
           name: debug apk
 
   test-ios:
-    if: ${{ false }} # gate to disable
     strategy:
       matrix:
         device:
@@ -114,7 +125,15 @@ jobs:
       - name: Test
         run: flutter test
       - name: Integration test
-        run: flutter test integration_test --verbose
+        run: flutter test integration_test/app_test.dart --verbose
+
+      - name: Take screenshots
+        run: flutter drive --driver=test_driver/integration_test.dart --target=integration_test/screenshot_test.dart
+      - name: screenshot artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: screenshots_ios
+          path: screenshots/*
 
   build-ios:
     needs: [test-ios]
